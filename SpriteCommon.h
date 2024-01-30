@@ -1,5 +1,4 @@
 #pragma once
-
 #include <Windows.h>
 #include <wrl.h>
 #include <string>
@@ -32,6 +31,7 @@ public:
 
 
 private:
+
 	static IDxcBlob* CompileShader(
 		const std::wstring& filePath,
 		const wchar_t* profile,
@@ -41,12 +41,11 @@ private:
 	);
 
 private:
+
 	DirectXCommon* dxCommon_ = nullptr;
 
 	ComPtr<ID3D12RootSignature> rootSignature;
 	ComPtr<ID3D12PipelineState> pipelineState = nullptr;
-
-
 
 };
 

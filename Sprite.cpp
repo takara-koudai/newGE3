@@ -56,6 +56,7 @@ void Sprite::Initialize(DirectXCommon* dxCommon, SpriteCommon* common)
 
 void Sprite::Update()
 {
+
 	ImGui::Begin("texture");
 
 	ImGui::DragFloat3("pos", &transform.tlanslate.x, 0.01f);
@@ -65,7 +66,6 @@ void Sprite::Update()
 	ImGui::DragFloat3("UV-Scale", &uvTransform.scale.x, 0.01f, -10.f, 10.f);
 
 	ImGui::End();
-
 
 }
 

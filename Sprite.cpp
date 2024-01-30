@@ -23,6 +23,7 @@ void Sprite::Initialize(DirectXCommon* dxCommon, SpriteCommon* common)
 	common_->UploadTextureData(textureResource, mipImages);
 	
 	
+
 	//metaData‚ğŠî‚ÉSRV‚Ìİ’è
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
 	srvDesc.Format = metaData.format;

@@ -40,8 +40,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     sprite->Initialize(dxCommon_, spriteCommon);
 
 
-
-
     // ゲームループ
     while (true) {
         //更新
@@ -54,11 +52,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
          //入力
         input_->Update();
+
+
+        //DirectX::XMFLOAT3 pos = sprite->GetPosition();
+        //pos.x += 1;
+
+        //sprite->SetPosition(pos);
         sprite->Update();
+
 
         //描画前処理
         ImGuiManager::CreateCommand();
         dxCommon_->PreDraw();
+        
 
         sprite->Draw();
 

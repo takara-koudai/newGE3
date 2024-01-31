@@ -40,9 +40,6 @@ void Sprite::Initialize(DirectXCommon* dxCommon, SpriteCommon* common)
 	////SRVÇÃê∂ê¨
 	dxCommon_->GetDevice()->CreateShaderResourceView(textureResource, &srvDesc, textureSrvHandleCPU);
 
-	
-
-
 
 	//í∏ì_ èÓïÒ 
 	CreateVertex();
@@ -56,6 +53,8 @@ void Sprite::Initialize(DirectXCommon* dxCommon, SpriteCommon* common)
 
 void Sprite::Update()
 {
+	transform.tlanslate = position;
+
 	ImGui::Begin("texture");
 
 	ImGui::DragFloat3("pos", &transform.tlanslate.x, 0.01f);

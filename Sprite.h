@@ -41,7 +41,15 @@ public:
 
 	void Draw();
 
+
+	//Getter/Setter
+	DirectX::XMFLOAT3 GetPosition() { return position; }
+
+	void SetPosition(DirectX::XMFLOAT3 pos) { position = pos; }
+
+
 private:
+
 	//頂点情報作成
 	void CreateVertex();
 	//インデックス情報作成
@@ -53,6 +61,7 @@ private:
 	void CreateWVP();
 
 private:
+
 	DirectXCommon* dxCommon_ = nullptr;
 	SpriteCommon* common_ = nullptr;
 	 //頂点情報
@@ -77,16 +86,17 @@ private:
 
 	 //パラメータ
 	DirectX::XMFLOAT4 color_ = { 1.0f,1.0f,1.0f,1.0f };
-	//						   scale   rotate  translate
+
+	//左からscale rotate translate
 	Transform uvTransform = { {1,1,1},{0,0,0},{0,0,0} };
 
-
-	 //					     scale	 rotate  translate
+	//左からscale rotate translate
 	Transform transform = { {1,1,1}, {0,0,0}, {0,0,0} };
+	DirectX::XMFLOAT3 position = { 0,0,0 };
+
 
 	Transform cameraTransform = { {1,1,1}, {0,0,0}, {0,0,-5} };
 
-	
 
 };
 

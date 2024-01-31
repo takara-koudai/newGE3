@@ -54,10 +54,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
         input_->Update();
 
 
-        DirectX::XMFLOAT3 pos = sprite->GetPosition();
-        pos.x += 1;
+        //DirectX::XMFLOAT3 pos = sprite->GetPosition();
+        //pos.x += 1;
 
-        sprite->SetPosition(pos);
+        //sprite->SetPosition(pos);
         sprite->Update();
 
 

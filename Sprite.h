@@ -43,9 +43,9 @@ public:
 
 
 	//Getter/Setter
-	DirectX::XMFLOAT3 GetPosition() { return position; }
+	//DirectX::XMFLOAT3 GetPosition() { return position; }
 
-	void SetPosition(DirectX::XMFLOAT3 pos) { position = pos; }
+	//void SetPosition(DirectX::XMFLOAT3 pos) { position = pos; }
 
 
 private:

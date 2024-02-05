@@ -53,7 +53,27 @@ void Sprite::Initialize(DirectXCommon* dxCommon, SpriteCommon* common)
 
 void Sprite::Update()
 {
-	transform.tlanslate = position;
+	transform.tlanslate = { position.x,position.y ,0};
+	transform.rotate = { 0,0,rotation };
+	materialData->color = color_;
+	transform.scale = { size.x,size.y,1.0f};
+
+
+	//¶‰º	
+	vertexDate[0].position = { -0.5f, -0.5f, 0.0f, 1.0f };
+	vertexDate[0].texcoord = { 0.0f,1.0f };
+	//ã
+	vertexDate[1].position = { -0.5f, +0.5f, 0.0f, 1.0f };
+	vertexDate[1].texcoord = { 0.0f,0.0f };
+	//‰E‰º
+	vertexDate[2].position = { +0.5f, -0.5f, 0.0f, 1.0f };
+	vertexDate[2].texcoord = { 1.0f,1.0f };
+
+	//ã
+	vertexDate[3].position = { +0.5f, +0.5f, 0.0f, 1.0f };
+	vertexDate[3].texcoord = { 1.0f, 0.0f };
+
+
 
 	ImGui::Begin("texture");
 
@@ -159,7 +179,7 @@ void Sprite::CreateVertex()
 	vertexBufferView.StrideInBytes = sizeof(VertexData);
 
 	//’¸“_ î•ñ
-	VertexData* vertexDate = nullptr;
+	
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexDate));
 
 	//¶‰º	

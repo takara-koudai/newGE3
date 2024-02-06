@@ -46,11 +46,14 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     //画像
     //Sprite* sprite = new Sprite();
     std::vector<Sprite*> sprite;
+
+    //数字を1にすれば1枚だけ描画できる
     for (int i = 0; i < 5; i++)
     {
         Sprite* temp = new Sprite();
         temp->Initialize(spriteCommon, L"Resources/mario.jpg");
         temp->SetPosition({ (float)i * 120,0 });
+        //temp->SetPosition({ 400,200 });
         sprite.push_back(temp);
     }
 

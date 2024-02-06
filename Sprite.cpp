@@ -28,6 +28,10 @@ void Sprite::Initialize(SpriteCommon* common, std::wstring textureFilePath)
 	CreateMaterial();
 	//行列
 	CreateWVP();
+
+	//画像のサイズを整理する
+	AdjustTextureSize();
+
 }
 
 void Sprite::Update()
@@ -37,20 +41,45 @@ void Sprite::Update()
 	materialData->color = color_;
 	transform.scale = { size.x,size.y,1.0f};
 
+	//アンカーポイント更新
+	float left = 0.0f - anchorPoint.x;
+	float right = 1.0f - anchorPoint.x;
+	float top = 0.0f - anchorPoint.y;
+	float bottom = 1.0f - anchorPoint.y;
 
-	//左下	
-	vertexDate[0].position = { 0.0f, 1.0f, 0.0f, 1.0f };
-	vertexDate[0].texcoord = { 0.0f,1.0f };
-	//上
-	vertexDate[1].position = { 0.f, 0.0f, 0.0f, 1.0f };
-	vertexDate[1].texcoord = { 0.0f,0.0f };
-	//右下
-	vertexDate[2].position = { 1.0f, 1.0f, 0.0f, 1.0f };
-	vertexDate[2].texcoord = { 1.0f,1.0f };
+	//フリップ
+	if (isFlipX == true)
+	{
+		//左右反転
+		left = -left;
+		right = -right;
+	}
+	if (isFlipY == true)
+	{
+		//上下反転
+		top = -top;
+		bottom = -bottom;
+	}
 
-	//上
-	vertexDate[3].position = { 1.0f, 0.0f, 0.0f, 1.0f };
-	vertexDate[3].texcoord = { 1.0f, 0.0f };
+
+	//頂点情報
+	vertexDate[0].position = { left, bottom, 0.0f, 1.0f };
+	vertexDate[1].position = { left, top, 0.0f, 1.0f };
+	vertexDate[2].position = { right, bottom, 0.0f, 1.0f };
+	vertexDate[3].position = { right, top, 0.0f, 1.0f };
+
+	const DirectX::TexMetadata& metaData = TextureManager::GetInstance()->GetMetaData(textureIndex_);
+	float tex_left = textureLeftTop.x / metaData.width;
+	float tex_right = (textureLeftTop.x + textureSize.x) / metaData.width;
+	float tex_top = textureLeftTop.y / metaData.height;
+	float tex_bottom = (textureLeftTop.y + textureSize.y) / metaData.height;
+
+
+	//UV
+	vertexDate[0].texcoord = { tex_left,tex_bottom };
+	vertexDate[1].texcoord = { tex_left,tex_top };
+	vertexDate[2].texcoord = { tex_right,tex_bottom };
+	vertexDate[3].texcoord = { tex_right,tex_top };
 
 
 
@@ -61,6 +90,9 @@ void Sprite::Update()
 	ImGui::DragFloat3("UV-Pos", &uvTransform.tlanslate.x, 0.01f,-10.f,10.f);
 	ImGui::SliderAngle("UV-Rot", &uvTransform.rotate.z);
 	ImGui::DragFloat3("UV-Scale", &uvTransform.scale.x, 0.01f, -10.f, 10.f);
+
+	ImGui::Checkbox("FlipX", &isFlipX);
+	ImGui::Checkbox("FlipY", &isFlipY);
 
 	ImGui::End();
 
@@ -226,5 +258,15 @@ void Sprite::CreateWVP()
 
 	*wvpData = XMMatrixIdentity();
 
+}
+
+void Sprite::AdjustTextureSize()
+{
+	const DirectX::TexMetadata& metaData = TextureManager::GetInstance()->GetMetaData(textureIndex_);
+
+	textureSize.x = static_cast<float>(metaData.width);
+	textureSize.y = static_cast<float>(metaData.height);
+
+	size = textureSize;
 }
 

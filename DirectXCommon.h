@@ -15,8 +15,6 @@
 
 using namespace Microsoft::WRL;
 
-
-
 class DirectXCommon
 {
 private:
@@ -44,7 +42,6 @@ public:
 	ID3D12DescriptorHeap* GetSrvDescriptorHeap() { return srvDescriptorHeap.Get(); }
 
 
-
 private:
 	//デバイス
 	void DeviceInitialize();
@@ -62,20 +59,20 @@ private:
 	//	 ディスクリプタヒープ作成
 	ID3D12DescriptorHeap* CreateDescripterHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType,UINT numDescripots,bool shaderVisible);
 
-
-
-
-
 	void InitializeFixFPS();
 	void UpdateFixFPS();
 	//記録時間(FPS固定用)
 	std::chrono::steady_clock::time_point reference_;
 
+public:
+
+	static const uint32_t kMaxSRVCount;
+
+
 private:
 	//WindowsAPI
 	WinApp* winApp = nullptr;
 
-	
 
 	ComPtr<ID3D12Device> device;
 	ComPtr<IDXGIFactory7> dxgiFactory;
@@ -110,7 +107,6 @@ private:
 
 	//SRV(画像などを保存しておくもの)
 	ComPtr<ID3D12DescriptorHeap> srvDescriptorHeap;
-
 
 
 };

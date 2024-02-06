@@ -158,51 +158,6 @@ void SpriteCommon::Initialize(DirectXCommon* dxCommon)
 
 }
 
-DirectX::ScratchImage SpriteCommon::Loadtexture(const std::wstring& filePath)
-{
-	//テクスチャファイルを読んでプログラムを扱えるようにする
-	DirectX::ScratchImage image{};
-	HRESULT result = DirectX::LoadFromWICFile(filePath.c_str(), DirectX::WIC_FLAGS_FORCE_SRGB, nullptr, image);
-
-	assert(SUCCEEDED(result));
-
-	//ミニマップの作成
-	DirectX::ScratchImage mipImages{};
-	result = DirectX::GenerateMipMaps(image.GetImages(), image.GetImageCount(),
-		image.GetMetadata(), 
-		DirectX::TEX_FILTER_SRGB, 0, mipImages);
-
-	assert(SUCCEEDED(result));
-
-
-	return image;
-}
-
-void SpriteCommon::UploadTextureData(ID3D12Resource* texture, 
-	const DirectX::ScratchImage& mipImage)
-{
-
-	//Meta情報を取得
-	const DirectX::TexMetadata& metadata = mipImage.GetMetadata();
-	//全MipMap
-	for (size_t mipLevel = 0; mipLevel < metadata.mipLevels; ++mipLevel) {
-		
-		const DirectX::Image* img = mipImage.GetImage(mipLevel, 0, 0);
-		
-		//転送(シェーダー)テクスチャの全情報を送る
-		HRESULT result = texture->WriteToSubresource(
-			UINT(mipLevel),
-			nullptr,              
-			img->pixels,            
-			UINT(img->rowPitch),   
-			UINT(img->slicePitch)   
-
-		);
-		assert(SUCCEEDED(result));
-	}
-
-}
-
 IDxcBlob* SpriteCommon::CompileShader(const std::wstring& filePath, const wchar_t* profile, IDxcUtils* dxcUtils, IDxcCompiler3* dxcCompiler, IDxcIncludeHandler* includeHandler)
 {
 	HRESULT result{};

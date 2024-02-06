@@ -5,40 +5,19 @@
 
 #include"externals/imgui/imgui.h"
 
+#include "TextureManager.h"
 
 using namespace Microsoft::WRL;
 using namespace DirectX;
 
 
-void Sprite::Initialize(DirectXCommon* dxCommon, SpriteCommon* common)
+void Sprite::Initialize(SpriteCommon* common, std::wstring textureFilePath)
 {
-	dxCommon_ = dxCommon;
-
 	common_ = common;
 
-	//画像の読み取り
-	DirectX::ScratchImage mipImages = common->Loadtexture(L"Resources/mario.jpg");
-	const DirectX::TexMetadata& metaData = mipImages.GetMetadata();
-	ID3D12Resource* textureResource = CreateTexureResource(dxCommon_->GetDevice(),metaData);
-	common_->UploadTextureData(textureResource, mipImages);
-	
-	
+	dxCommon_ = common_->GetDirectXCommon();
 
-	//metaDataを基にSRVの設定
-	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
-	srvDesc.Format = metaData.format;
-	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
-	srvDesc.Texture2D.MipLevels = UINT(metaData.mipLevels);
-
-	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = dxCommon_->GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
-	textureSrvHandleGPU = dxCommon_->GetSrvDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
-	//先頭はImGuiが使っているのでその次を使う
-	textureSrvHandleCPU.ptr += dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	textureSrvHandleGPU.ptr += dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-
-	////SRVの生成
-	dxCommon_->GetDevice()->CreateShaderResourceView(textureResource, &srvDesc, textureSrvHandleCPU);
+	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexFilePath(textureFilePath);
 
 
 	//頂点 情報 
@@ -60,17 +39,17 @@ void Sprite::Update()
 
 
 	//左下	
-	vertexDate[0].position = { -0.5f, -0.5f, 0.0f, 1.0f };
+	vertexDate[0].position = { 0.0f, 1.0f, 0.0f, 1.0f };
 	vertexDate[0].texcoord = { 0.0f,1.0f };
 	//上
-	vertexDate[1].position = { -0.5f, +0.5f, 0.0f, 1.0f };
+	vertexDate[1].position = { 0.f, 0.0f, 0.0f, 1.0f };
 	vertexDate[1].texcoord = { 0.0f,0.0f };
 	//右下
-	vertexDate[2].position = { +0.5f, -0.5f, 0.0f, 1.0f };
+	vertexDate[2].position = { 1.0f, 1.0f, 0.0f, 1.0f };
 	vertexDate[2].texcoord = { 1.0f,1.0f };
 
 	//上
-	vertexDate[3].position = { +0.5f, +0.5f, 0.0f, 1.0f };
+	vertexDate[3].position = { 1.0f, 0.0f, 0.0f, 1.0f };
 	vertexDate[3].texcoord = { 1.0f, 0.0f };
 
 
@@ -107,26 +86,25 @@ void Sprite::Draw()
 	XMMATRIX cameraScaleMatrix = XMMatrixScalingFromVector(XMLoadFloat3(&cameraTransform.scale));
 	XMMATRIX cameraRotateMatrix = XMMatrixRotationRollPitchYawFromVector(XMLoadFloat3(&cameraTransform.rotate));
 	XMMATRIX cameraTranslateMatrix = XMMatrixTranslationFromVector(XMLoadFloat3(&cameraTransform.tlanslate));
-
 	//回転行列とスケール行列の掛け算
 	XMMATRIX cameraRotateAndScaleMatrix = XMMatrixMultiply(cameraRotateMatrix, cameraScaleMatrix);
 	//最終的な行列変換
 	XMMATRIX cameraMatrix = XMMatrixMultiply(cameraRotateAndScaleMatrix, cameraTranslateMatrix);
-
 	//View
 	XMMATRIX view = XMMatrixInverse(nullptr, cameraMatrix);
-	XMMATRIX proj = XMMatrixPerspectiveFovLH(
+
+	XMMATRIX proj = XMMatrixOrthographicOffCenterLH(0,WinApp::window_width,WinApp::window_height,0,0.1f,100.f);
+
+	/*XMMATRIX proj = XMMatrixPerspectiveFovLH(
 		XMConvertToRadians(45.f),
 		(float)WinApp::window_width / (float)WinApp::window_height,
 		0.1f,
 		100.f
 
-	);
+	);*/
 	//WVP
 	XMMATRIX worldViewProjectionMatrix = worldMatrix * (view * proj);
-
-
-	//
+	//行列の代入
 	*wvpData = worldViewProjectionMatrix;
 
 
@@ -156,13 +134,19 @@ void Sprite::Draw()
 	//行列
 	dxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(1, wvpResource->GetGPUVirtualAddress());
 	//画像
-	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU); 
+	dxCommon_->GetCommandList()->SetGraphicsRootDescriptorTable(2, TextureManager::GetInstance()->GetSrvHandleGPU(textureIndex_)); 
 	
 	//頂点情報のみ描画
 	//dxCommon_->GetCommandList()->DrawInstanced(6, 1,0, 0);
 	//インデックス情報がある場合の描画
 	dxCommon_->GetCommandList()->DrawIndexedInstanced(6, 1, 0, 0, 0);
 
+}
+
+
+void Sprite::SetTexture(std::wstring textureFilePath)
+{
+	textureIndex_ = TextureManager::GetInstance()->GetTextureIndexFilePath(textureFilePath);
 }
 
 void Sprite::CreateVertex()
@@ -183,17 +167,17 @@ void Sprite::CreateVertex()
 	vertexResource->Map(0, nullptr, reinterpret_cast<void**>(&vertexDate));
 
 	//左下	
-	vertexDate[0].position = { -0.5f, -0.5f, 0.0f, 1.0f };
+	vertexDate[0].position = { 0.0f, 1.0f, 0.0f, 1.0f };
 	vertexDate[0].texcoord = { 0.0f,1.0f };
 	//上
-	vertexDate[1].position = { -0.5f, +0.5f, 0.0f, 1.0f };
+	vertexDate[1].position = { 0.f, 0.0f, 0.0f, 1.0f };
 	vertexDate[1].texcoord = { 0.0f,0.0f };
 	//右下
-	vertexDate[2].position = { +0.5f, -0.5f, 0.0f, 1.0f };
+	vertexDate[2].position = { 1.0f, 1.0f, 0.0f, 1.0f };
 	vertexDate[2].texcoord = { 1.0f,1.0f };
 
 	//上
-	vertexDate[3].position = { +0.5f, +0.5f, 0.0f, 1.0f };
+	vertexDate[3].position = { 1.0f, 0.0f, 0.0f, 1.0f };
 	vertexDate[3].texcoord = { 1.0f, 0.0f };
 	
 }

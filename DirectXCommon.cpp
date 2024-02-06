@@ -2,6 +2,9 @@
 #include <cassert>
 #include <thread>
 
+
+const uint32_t DirectXCommon::kMaxSRVCount = 512;
+
 void DirectXCommon::Initialize(WinApp* winApp)
 {
     InitializeFixFPS();
@@ -31,11 +34,8 @@ void DirectXCommon::Initialize(WinApp* winApp)
        D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 2, false);
 
     srvDescriptorHeap = CreateDescripterHeap(
-       D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 128, true);
-
-
-
-
+       D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, kMaxSRVCount, true);
+    
 }
 
 void DirectXCommon::PreDraw()

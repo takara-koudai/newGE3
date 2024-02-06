@@ -35,7 +35,7 @@ private:
 
 public:
 
-	void Initialize(DirectXCommon* dxCommon, SpriteCommon* common);
+	void Initialize(SpriteCommon* common, std::wstring textureFilePath);
 
 	void Update();
 
@@ -52,6 +52,9 @@ public:
 	void SetRotation(float rot) { rotation = rot; }
 	void SetColor(DirectX::XMFLOAT4 color) { color_ = color; }
 	void SetSize(DirectX::XMFLOAT2 size) { this->size = size; }
+
+	void SetTexture(std::wstring textureFilePath);
+
 
 private:
 
@@ -87,9 +90,6 @@ private:
 	ComPtr<ID3D12Resource> wvpResource;
 	DirectX::XMMATRIX* wvpData = nullptr;
 
-	//メンバ変数
-	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU;
-
 	 //パラメータ
 	DirectX::XMFLOAT4 color_ = { 1.0f,1.0f,1.0f,1.0f };
 
@@ -101,7 +101,11 @@ private:
 	DirectX::XMFLOAT2 position = { 0,0 };
 	float rotation = 0;
 
-	DirectX::XMFLOAT2 size = { 1,1 };
+	DirectX::XMFLOAT2 size = { 512,512 };
+
+	//画像の保存されてる場所
+	uint32_t textureIndex_ = 0;
+
 
 	Transform cameraTransform = { {1,1,1}, {0,0,0}, {0,0,-5} };
 
